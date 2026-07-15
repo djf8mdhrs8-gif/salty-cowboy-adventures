@@ -117,18 +117,24 @@ flips to the confirmation view automatically.
 
 ## Deployment (Vercel)
 
+The `vercel-build` script makes deploys self-setting-up: on every build it
+syncs the schema (`prisma db push`), runs the idempotent seed, and creates the
+admin account from env vars — no terminal required.
+
 1. Push this repo to GitHub and import it in Vercel.
-2. Provision Postgres (Vercel Postgres/Neon/Supabase) and set every env var from
-   `.env.example` in Vercel → Project → Settings → Environment Variables
-   (`NEXT_PUBLIC_SITE_URL` = your production domain).
-3. Run migrations against the production DB:
-   `DATABASE_URL=… npx prisma migrate deploy` (or `npx prisma db push` for a first deploy),
-   then `DATABASE_URL=… npx prisma db seed` and create your admin with
-   `DATABASE_URL=… npm run create-admin -- --email … --password …`.
-4. Add the production Stripe webhook endpoint (above).
-5. `vercel.json` schedules `/api/cron/reminders` daily at 13:00 UTC; Vercel Cron
+2. In the Vercel project, open **Storage → Create Database → Neon (Postgres)**
+   and connect it — this adds `DATABASE_URL` automatically.
+3. Add the remaining env vars (Settings → Environment Variables):
+   `NEXT_PUBLIC_SITE_URL` (your production URL), `AUTH_SECRET`, `CRON_SECRET`,
+   the Stripe keys, and `ADMIN_EMAIL` / `ADMIN_PASSWORD` (10+ chars) /
+   `ADMIN_NAME` for the bootstrap admin account.
+4. Redeploy. Sign in at `/admin/login` with the ADMIN_* credentials.
+5. Add the production Stripe webhook endpoint (above).
+6. `vercel.json` schedules `/api/cron/reminders` daily at 13:00 UTC; Vercel Cron
    automatically sends `Authorization: Bearer $CRON_SECRET`.
-6. Deploy. Sign in at `/admin/login`.
+
+Once live, you can remove `ADMIN_EMAIL`/`ADMIN_PASSWORD` from the env (the
+account persists), or leave them to act as a password reset on each deploy.
 
 ## Testing
 
