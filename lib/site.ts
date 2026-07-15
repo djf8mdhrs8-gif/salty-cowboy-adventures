@@ -3,6 +3,9 @@
 export const SITE_NAME = "Salty Cowboy Adventures";
 export const SITE_LEGAL_NAME = "Salty Cowboy Adventures Inc.";
 export const SITE_TAGLINE = "Fishing, Coastal Tours, and Private Adventures";
+export const SITE_MOTTO = "Explore More. Live Salty.";
+export const SITE_EST = "2024";
+export const BOAT_NAME = "2018 24ft Skeeter center-console";
 
 export function siteUrl(): string {
   return (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");

@@ -40,10 +40,13 @@ export function Footer() {
       <div className="container-content grid gap-10 py-12 md:grid-cols-4">
         <div className="md:col-span-2">
           <LogoLockup dark />
-          <p className="mt-4 max-w-md text-sm leading-relaxed text-navy-100/80">
+          <p className="mt-3 font-heading text-sm font-bold uppercase tracking-[0.2em] text-tan-300">
+            Explore More. Live Salty.
+          </p>
+          <p className="mt-3 max-w-md text-sm leading-relaxed text-navy-100/80">
             Premium fishing charters, coastal tours, and private adventures with a
-            little western grit. Family-owned, coast-proud, and always chasing the
-            next horizon.
+            little western grit aboard our 2018 24ft Skeeter. Family-owned,
+            coast-proud, and always chasing the next horizon.
           </p>
           <div className="mt-5 flex gap-4">
             <a
@@ -109,7 +112,7 @@ export function Footer() {
         <div className="container-content flex flex-col items-center justify-between gap-2 py-5 text-xs text-navy-100/60 sm:flex-row">
           <p className="flex items-center gap-1.5">
             <Anchor className="h-3.5 w-3.5" aria-hidden />
-            © {new Date().getFullYear()} {SITE_LEGAL_NAME} All rights reserved.
+            © {new Date().getFullYear()} {SITE_LEGAL_NAME} All rights reserved. Est. 2024.
           </p>
           <p>Licensed &amp; insured · USCG-licensed captain</p>
         </div>

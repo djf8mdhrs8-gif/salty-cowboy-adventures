@@ -10,6 +10,7 @@ import { SectionHeading } from "@/components/shared/SectionHeading";
 import { ScenicImage } from "@/components/shared/ScenicImage";
 import { TripCard } from "@/components/trips/TripCard";
 import { PhoneLink } from "@/components/shared/PhoneLink";
+import { LogoBadge } from "@/components/brand/Logo";
 
 export const dynamic = "force-dynamic"; // reads featured trips from the DB
 
@@ -44,7 +45,7 @@ export default async function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-t from-navy-950/90 via-navy-900/60 to-navy-900/30" />
         <div className="container-content relative py-24 text-center sm:py-32 lg:py-40">
           <p className="mb-4 text-xs font-bold uppercase tracking-[0.35em] text-coastal-300">
-            Saltwater · Sunsets · A Little Western Grit
+            Explore More · Live Salty
           </p>
           <h1 className="mx-auto max-w-3xl text-4xl font-bold text-cream-50 sm:text-5xl lg:text-6xl">
             Fishing, Coastal Tours, and Private Adventures
@@ -86,14 +87,15 @@ export default async function HomePage() {
               trip like it&apos;s the only one on the calendar.
             </p>
             <p className="mt-4 text-lg leading-relaxed text-navy-600">
-              Every charter is private — just your crew, the captain, and open water.
+              You&apos;ll ride aboard our meticulously kept 2018 24ft Skeeter
+              center-console — Yamaha 250 on the back, T-top shade overhead, and room
+              for the whole crew. Every charter is private: just your group, the
+              captain, and open water.
             </p>
           </div>
-          <ScenicImage
-            label="The Salty Cowboy center-console boat cruising calm coastal water"
-            scene="ocean"
-            className="h-72 rounded-xl shadow-card lg:h-96"
-          />
+          <div className="flex items-center justify-center">
+            <LogoBadge className="w-full max-w-sm drop-shadow-lg lg:max-w-md" />
+          </div>
         </div>
       </section>
 

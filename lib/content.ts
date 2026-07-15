@@ -73,7 +73,7 @@ export const WHY_CHOOSE_US = [
   },
   {
     title: "Premium, Spotless Boat",
-    body: "A meticulously kept center-console built for comfort: shade, dry storage, and room for the whole crew.",
+    body: "A meticulously kept 2018 24ft Skeeter center-console with a Yamaha 250 — T-top shade, dry storage, and room for the whole crew.",
   },
   {
     title: "Everything Included",
