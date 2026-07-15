@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-cream-50 font-body text-navy-800 antialiased;
+  }
+
+  /* Visible focus for keyboard users, everywhere. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-coastal-500 ring-offset-2 ring-offset-cream-50;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-heading text-navy-900;
+    text-wrap: balance;
+  }
+}
+
+@layer components {
+  .container-content {
+    @apply mx-auto w-full max-w-content px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Rope-style divider — used sparingly for western accents. */
+  .rope-divider {
+    height: 6px;
+    background-image: repeating-linear-gradient(
+      -45deg,
+      #c8a878 0 6px,
+      #b8945f 6px 12px
+    );
+    border-radius: 9999px;
+    opacity: 0.7;
+  }
+
+  .btn {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md px-6 py-3 text-base font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply btn bg-navy-800 text-cream-50 hover:bg-navy-700 active:bg-navy-900;
+  }
+
+  .btn-secondary {
+    @apply btn border-2 border-navy-800 bg-transparent text-navy-800 hover:bg-navy-800 hover:text-cream-50;
+  }
+
+  .btn-accent {
+    @apply btn bg-tan-500 text-white hover:bg-tan-600;
+  }
+
+  .field-label {
+    @apply mb-1.5 block text-sm font-semibold text-navy-800;
+  }
+
+  .field-input {
+    @apply block w-full rounded-md border border-tan-200 bg-white px-3.5 py-2.5 text-base text-navy-900 placeholder:text-navy-300 focus:border-coastal-500;
+  }
+
+  .field-error {
+    @apply mt-1.5 text-sm font-medium text-red-700;
+  }
+}
+
+@layer utilities {
+  .sr-only-focusable:focus {
+    @apply not-sr-only fixed left-4 top-4 z-[100] rounded-md bg-navy-900 px-4 py-2 text-cream-50;
+  }
+}
+
+@media print {
+  header,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+}

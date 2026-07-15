@@ -1,0 +1,444 @@
+// Salty Cowboy Adventures — booking platform schema.
+// All monetary values are integer cents. All dates that represent a local
+// calendar day are stored as "yyyy-MM-dd" strings and times as "HH:mm" to
+// keep scheduling timezone-safe (the business operates in one local timezone).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────── Enums ───────────────────────────────
+
+enum UserRole {
+  ADMIN
+  STAFF
+}
+
+enum BookingStatus {
+  PENDING // created, checkout not yet started/finished; holds slot until holdExpiresAt
+  AWAITING_PAYMENT // checkout session created; holds slot until holdExpiresAt
+  CONFIRMED // payment verified by Stripe webhook
+  RESCHEDULED // confirmed, moved to a new date/time
+  COMPLETED
+  CANCELLED
+  REFUNDED
+  WEATHER_HOLD
+  NO_SHOW
+}
+
+enum PaymentPlan {
+  DEPOSIT
+  FULL
+}
+
+enum DepositMode {
+  FULL_ONLY // customer must pay in full
+  DEPOSIT_ONLY // customer pays deposit only online
+  CUSTOMER_CHOICE // customer picks deposit or full
+}
+
+enum PaymentType {
+  DEPOSIT
+  BALANCE
+  FULL
+  MANUAL // recorded by admin (cash/check/other)
+}
+
+enum PaymentMethod {
+  CARD
+  CASH
+  CHECK
+  OTHER
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum RefundStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+}
+
+enum AddonPricing {
+  FLAT
+  PER_GUEST
+}
+
+enum EmailType {
+  BOOKING_CONFIRMATION
+  PAYMENT_RECEIPT
+  PAYMENT_FAILED
+  TRIP_REMINDER
+  BALANCE_REMINDER
+  BOOKING_RESCHEDULED
+  BOOKING_CANCELLED
+  REFUND_ISSUED
+  WEATHER_DELAY
+  WEATHER_CANCELLATION
+  MAGIC_LINK
+  CONTACT_FORM
+}
+
+enum EmailStatus {
+  SENT
+  FAILED
+  SKIPPED // no RESEND_API_KEY configured (dev mode)
+}
+
+enum FishingExperience {
+  NONE
+  BEGINNER
+  INTERMEDIATE
+  EXPERIENCED
+}
+
+enum GuestType {
+  ADULT
+  CHILD
+}
+
+// ─────────────────────────────── Auth ────────────────────────────────
+
+model User {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  name      String
+  role      UserRole   @default(STAFF)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  admin     AdminUser?
+}
+
+model AdminUser {
+  id           String     @id @default(cuid())
+  userId       String     @unique
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  passwordHash String
+  lastLoginAt  DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  auditLogs    AuditLog[]
+  refunds      Refund[]
+}
+
+// ───────────────────────────── Customers ─────────────────────────────
+
+model Customer {
+  id                 String              @id @default(cuid())
+  email              String              @unique
+  firstName          String
+  lastName           String
+  phone              String
+  stripeCustomerId   String?             @unique
+  notes              String?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  bookings           Booking[]
+  payments           Payment[]
+  waiverAcceptances  WaiverAcceptance[]
+
+  @@index([lastName, firstName])
+}
+
+// ─────────────────────────── Trip catalog ────────────────────────────
+
+model TripPackage {
+  id                      String             @id @default(cuid())
+  slug                    String             @unique
+  name                    String
+  tagline                 String
+  description             String
+  durationMinutes         Int // for custom-duration trips this is the default/base duration
+  customDuration          Boolean            @default(false)
+  basePriceCents          Int
+  includedGuests          Int // guests covered by base price
+  maxGuests               Int
+  additionalGuestFeeCents Int                @default(0)
+  depositMode             DepositMode        @default(CUSTOMER_CHOICE)
+  depositPercent          Int                @default(25) // % of total due as deposit
+  included                String[] // what's included bullets
+  whatToBring             String[]
+  showFishingExperience   Boolean            @default(false)
+  familyFriendly          Boolean            @default(true)
+  featured                Boolean            @default(false)
+  active                  Boolean            @default(true)
+  sortOrder               Int                @default(0)
+  imageUrl                String?
+  seoDescription          String?
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
+  bookings                Booking[]
+  availabilityRules       AvailabilityRule[]
+  addons                  TripAddon[]        @relation("PackageAddons")
+
+  @@index([active, sortOrder])
+}
+
+model TripAddon {
+  id            String        @id @default(cuid())
+  slug          String        @unique
+  name          String
+  description   String
+  priceCents    Int
+  pricing       AddonPricing  @default(FLAT)
+  maxQuantity   Int           @default(1)
+  global        Boolean       @default(true) // applies to all packages when true
+  active        Boolean       @default(true)
+  sortOrder     Int           @default(0)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  packages      TripPackage[] @relation("PackageAddons")
+  bookingAddons BookingAddon[]
+}
+
+// ─────────────────────────── Availability ────────────────────────────
+
+model AvailabilityRule {
+  id          String       @id @default(cuid())
+  packageId   String? // null = applies to every package
+  package     TripPackage? @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  daysOfWeek  Int[] // 0 = Sunday … 6 = Saturday
+  startTimes  String[] // "HH:mm" local start times
+  seasonStart String? // "yyyy-MM-dd" inclusive; null = year-round
+  seasonEnd   String? // "yyyy-MM-dd" inclusive
+  label       String? // e.g. "Summer schedule"
+  active      Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([packageId, active])
+}
+
+model BlockedDate {
+  id        String   @id @default(cuid())
+  date      String // "yyyy-MM-dd"
+  startTime String? // "HH:mm"; null with endTime null = whole day blocked
+  endTime   String?
+  reason    String?
+  createdAt DateTime @default(now())
+
+  @@index([date])
+}
+
+// ───────────────────────────── Bookings ──────────────────────────────
+
+model Booking {
+  id                    String             @id @default(cuid())
+  confirmationNumber    String             @unique
+  packageId             String
+  package               TripPackage        @relation(fields: [packageId], references: [id])
+  customerId            String
+  customer              Customer           @relation(fields: [customerId], references: [id])
+  status                BookingStatus      @default(PENDING)
+  date                  String // "yyyy-MM-dd"
+  startTime             String // "HH:mm"
+  durationMinutes       Int
+  // Hard DB guard against two active bookings on the identical slot.
+  // Set to "date|startTime" while the booking blocks the calendar; null once
+  // cancelled/refunded so the slot can be resold. Overlapping (non-identical)
+  // slots are prevented by the advisory-lock transaction in lib/server/bookings.
+  slotKey               String?            @unique
+  holdExpiresAt         DateTime? // PENDING/AWAITING_PAYMENT bookings release the slot after this
+  adults                Int
+  children              Int                @default(0)
+  specialRequests       String?
+  accessibilityNeeds    String?
+  fishingExperience     FishingExperience?
+  emergencyContactName  String
+  emergencyContactPhone String
+  pickupLocation        String?
+  paymentPlan           PaymentPlan
+  subtotalCents         Int
+  addonsCents           Int                @default(0)
+  taxCents              Int                @default(0)
+  feeCents              Int                @default(0)
+  totalCents            Int
+  depositCents          Int
+  amountPaidCents       Int                @default(0)
+  refundedCents         Int                @default(0)
+  internalNotes         String?
+  cancellationReason    String?
+  cancelledAt           DateTime?
+  completedAt           DateTime?
+  rescheduledFromDate   String?
+  rescheduledFromTime   String?
+  manageTokenHash       String? // sha256 of the customer magic-link token
+  manageTokenExpiresAt  DateTime?
+  createdByAdmin        Boolean            @default(false)
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+  guests                BookingGuest[]
+  addons                BookingAddon[]
+  payments              Payment[]
+  refunds               Refund[]
+  waiverAcceptance      WaiverAcceptance?
+  emailLogs             EmailLog[]
+
+  @@index([date, status])
+  @@index([customerId])
+  @@index([packageId])
+  @@index([status, holdExpiresAt])
+  @@index([createdAt])
+}
+
+model BookingGuest {
+  id        String    @id @default(cuid())
+  bookingId String
+  booking   Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  type      GuestType
+  firstName String?
+  lastName  String?
+  createdAt DateTime  @default(now())
+
+  @@index([bookingId])
+}
+
+model BookingAddon {
+  id             String    @id @default(cuid())
+  bookingId      String
+  booking        Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  addonId        String
+  addon          TripAddon @relation(fields: [addonId], references: [id])
+  quantity       Int       @default(1)
+  unitPriceCents Int
+  totalCents     Int
+
+  @@unique([bookingId, addonId])
+}
+
+// ───────────────────────────── Payments ──────────────────────────────
+
+model Payment {
+  id                      String        @id @default(cuid())
+  bookingId               String
+  booking                 Booking       @relation(fields: [bookingId], references: [id])
+  customerId              String?
+  customer                Customer?     @relation(fields: [customerId], references: [id])
+  type                    PaymentType
+  method                  PaymentMethod @default(CARD)
+  status                  PaymentStatus @default(PENDING)
+  amountCents             Int
+  currency                String        @default("usd")
+  stripeCheckoutSessionId String?       @unique
+  stripePaymentIntentId   String?       @unique
+  stripeCustomerId        String?
+  receiptUrl              String?
+  failureReason           String?
+  note                    String? // for manual payments
+  paidAt                  DateTime?
+  createdAt               DateTime      @default(now())
+  updatedAt               DateTime      @updatedAt
+  refunds                 Refund[]
+
+  @@index([bookingId])
+  @@index([status])
+}
+
+model Refund {
+  id             String       @id @default(cuid())
+  paymentId      String
+  payment        Payment      @relation(fields: [paymentId], references: [id])
+  bookingId      String
+  booking        Booking      @relation(fields: [bookingId], references: [id])
+  amountCents    Int
+  reason         String?
+  status         RefundStatus @default(PENDING)
+  stripeRefundId String?      @unique
+  issuedById     String?
+  issuedBy       AdminUser?   @relation(fields: [issuedById], references: [id])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([bookingId])
+}
+
+// ─────────────────────── Waivers, email, audit ────────────────────────
+
+model WaiverAcceptance {
+  id               String   @id @default(cuid())
+  bookingId        String   @unique
+  booking          Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  customerId       String
+  customer         Customer @relation(fields: [customerId], references: [id])
+  policyVersion    String
+  policiesAccepted String[] // e.g. ["terms","cancellation","weather","liability","payment"]
+  acceptedAt       DateTime @default(now())
+  ipAddress        String?
+  userAgent        String?
+}
+
+model EmailLog {
+  id         String      @id @default(cuid())
+  bookingId  String?
+  booking    Booking?    @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  to         String
+  type       EmailType
+  subject    String
+  status     EmailStatus
+  providerId String? // Resend message id
+  error      String?
+  createdAt  DateTime    @default(now())
+
+  @@index([bookingId])
+  @@index([type, createdAt])
+}
+
+model AuditLog {
+  id          String     @id @default(cuid())
+  adminUserId String?
+  adminUser   AdminUser? @relation(fields: [adminUserId], references: [id], onDelete: SetNull)
+  action      String // e.g. "booking.cancel", "package.update"
+  entityType  String
+  entityId    String
+  details     Json?
+  ipAddress   String?
+  createdAt   DateTime   @default(now())
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
+
+// Stripe webhook idempotency: an event id is recorded before processing and
+// duplicate deliveries are acknowledged without re-processing.
+model WebhookEvent {
+  id            String   @id @default(cuid())
+  stripeEventId String   @unique
+  type          String
+  processedAt   DateTime @default(now())
+}
+
+// ───────────────────────────── Settings ──────────────────────────────
+
+// Singleton row (id = "default") of business-configurable settings.
+model SiteSettings {
+  id                    String   @id @default("default")
+  companyName           String   @default("Salty Cowboy Adventures Inc.")
+  phone                 String   @default("(555) 123-4567")
+  email                 String   @default("ahoy@saltycowboyadventures.example.com")
+  marinaAddress         String   @default("Dock 7, Placeholder Marina, 123 Harbor Way, Coastal Town, ST 00000")
+  serviceArea           String   @default("Coastal Town and surrounding waters")
+  instagramUrl          String   @default("https://instagram.com/saltycowboyadventures")
+  facebookUrl           String   @default("https://facebook.com/saltycowboyadventures")
+  taxRateBps            Int      @default(700) // 7.00% sales tax (basis points)
+  bookingFeeBps         Int      @default(300) // 3.00% booking/processing fee
+  minNoticeHours        Int      @default(24)
+  maxAdvanceDays        Int      @default(180)
+  turnaroundMinutes     Int      @default(60) // buffer between trips
+  holdMinutes           Int      @default(30) // how long an unpaid booking holds its slot
+  reminderDaysBefore    Int[]    @default([7, 1]) // trip reminder schedule
+  balanceReminderDays   Int      @default(3) // days before trip to chase open balances
+  policyVersion         String   @default("2026-01-v1")
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
