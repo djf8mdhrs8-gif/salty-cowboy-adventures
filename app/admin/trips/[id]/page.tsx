@@ -38,6 +38,7 @@ export default async function EditTripPage({
             familyFriendly: trip.familyFriendly,
             featured: trip.featured,
             active: trip.active,
+            listed: trip.listed,
             sortOrder: trip.sortOrder,
           }}
         />

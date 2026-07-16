@@ -24,6 +24,7 @@ export interface PackageFormValues {
   familyFriendly: boolean;
   featured: boolean;
   active: boolean;
+  listed: boolean;
   sortOrder: number;
 }
 
@@ -46,6 +47,7 @@ const EMPTY: PackageFormValues = {
   familyFriendly: true,
   featured: false,
   active: true,
+  listed: true,
   sortOrder: 0,
 };
 
@@ -179,6 +181,10 @@ export function PackageForm({ initial }: { initial?: PackageFormValues }) {
         <label className="flex items-center gap-2 text-sm font-semibold">
           <input type="checkbox" className="h-5 w-5" checked={values.active} onChange={(e) => set("active", e.target.checked)} />
           Active (bookable)
+        </label>
+        <label className="flex items-center gap-2 text-sm font-semibold">
+          <input type="checkbox" className="h-5 w-5" checked={values.listed} onChange={(e) => set("listed", e.target.checked)} />
+          Show on trips page
         </label>
       </div>
       <div>

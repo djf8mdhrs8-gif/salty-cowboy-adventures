@@ -173,6 +173,9 @@ model TripPackage {
   familyFriendly          Boolean            @default(true)
   featured                Boolean            @default(false)
   active                  Boolean            @default(true)
+  // Bookable but not shown as its own card (e.g. a duration variant of
+  // another package, reached via that package's trip-length picker).
+  listed                  Boolean            @default(true)
   sortOrder               Int                @default(0)
   imageUrl                String?
   seoDescription          String?

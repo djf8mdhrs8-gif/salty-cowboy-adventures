@@ -34,7 +34,7 @@ const CATCH_GALLERY = [
 
 export default async function HomePage() {
   const featured = await prisma.tripPackage.findMany({
-    where: { active: true },
+    where: { active: true, listed: true },
     orderBy: [{ featured: "desc" }, { sortOrder: "asc" }],
     take: 3,
   });

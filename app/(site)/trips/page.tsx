@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 export default async function TripsPage() {
   const trips = await prisma.tripPackage.findMany({
-    where: { active: true },
+    where: { active: true, listed: true },
     orderBy: { sortOrder: "asc" },
   });
 

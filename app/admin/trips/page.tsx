@@ -66,6 +66,11 @@ export default async function AdminTripsPage() {
                   >
                     {t.active ? "Active" : "Disabled"}
                   </span>
+                  {t.active && !t.listed ? (
+                    <span className="mt-1 block text-[0.65rem] font-semibold uppercase text-navy-400">
+                      Hidden from trips page
+                    </span>
+                  ) : null}
                 </td>
               </tr>
             ))}

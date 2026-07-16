@@ -5,6 +5,7 @@ import type { TripPackage } from "@prisma/client";
 import { formatCents } from "@/lib/money";
 import { formatDuration } from "@/lib/dates";
 import { ScenicImage } from "@/components/shared/ScenicImage";
+import { DURATION_CARD_LABELS } from "@/lib/trip-groups";
 
 const SCENE_BY_SLUG: Record<string, "ocean" | "sunset" | "marsh"> = {
   "sunset-cruise": "sunset",
@@ -45,7 +46,10 @@ export function TripCard({ trip }: { trip: TripPackage }) {
             <div className="flex items-center gap-1.5">
               <Clock className="h-4 w-4 text-coastal-600" aria-hidden />
               <dt className="sr-only">Duration</dt>
-              <dd>{trip.customDuration ? "Custom duration" : formatDuration(trip.durationMinutes)}</dd>
+              <dd>
+                {DURATION_CARD_LABELS[trip.slug] ??
+                  (trip.customDuration ? "Custom duration" : formatDuration(trip.durationMinutes))}
+              </dd>
             </div>
             <div className="flex items-center gap-1.5">
               <Users className="h-4 w-4 text-coastal-600" aria-hidden />

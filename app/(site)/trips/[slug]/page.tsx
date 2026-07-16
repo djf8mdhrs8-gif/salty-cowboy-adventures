@@ -10,6 +10,7 @@ import { tripProductSchema } from "@/lib/schema-org";
 import { JsonLd } from "@/components/shared/JsonLd";
 import { ScenicImage } from "@/components/shared/ScenicImage";
 import { TripAvailability } from "@/components/trips/TripAvailability";
+import { durationGroupFor } from "@/lib/trip-groups";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -36,6 +37,18 @@ export default async function TripDetailPage({ params }: Props) {
     where: { slug, active: true },
   });
   if (!trip) notFound();
+
+  // Trip-length options (e.g. inshore 4h vs 8h) share one card; the detail
+  // page lets the customer switch between the active variants.
+  const groupSlugs = durationGroupFor(slug);
+  const variants = groupSlugs
+    ? (
+        await prisma.tripPackage.findMany({
+          where: { slug: { in: groupSlugs }, active: true },
+          select: { slug: true, durationMinutes: true, basePriceCents: true },
+        })
+      ).sort((a, b) => a.durationMinutes - b.durationMinutes)
+    : [];
 
   const depositLabel =
     trip.depositMode === "FULL_ONLY"
@@ -77,6 +90,34 @@ export default async function TripDetailPage({ params }: Props) {
           </nav>
           <h1 className="text-3xl font-bold sm:text-4xl">{trip.name}</h1>
           <p className="mt-3 text-lg text-navy-600">{trip.tagline}</p>
+
+          {variants.length > 1 ? (
+            <nav aria-label="Trip length" className="mt-5">
+              <p className="mb-2 text-xs font-bold uppercase tracking-wide text-navy-500">
+                Choose your trip length
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {variants.map((v) => {
+                  const current = v.slug === trip.slug;
+                  return (
+                    <Link
+                      key={v.slug}
+                      href={`/trips/${v.slug}`}
+                      aria-current={current ? "page" : undefined}
+                      className={`min-h-11 rounded-md px-4 py-2.5 text-sm font-semibold ring-1 transition-colors ${
+                        current
+                          ? "bg-navy-800 text-cream-50 ring-navy-800"
+                          : "bg-white text-navy-800 ring-tan-200 hover:bg-coastal-50"
+                      }`}
+                    >
+                      {formatDuration(v.durationMinutes)} —{" "}
+                      {formatCents(v.basePriceCents, { compact: true })}
+                    </Link>
+                  );
+                })}
+              </div>
+            </nav>
+          ) : null}
 
           <dl className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
             {[

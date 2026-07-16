@@ -30,6 +30,7 @@ const packageBaseSchema = z.object({
   familyFriendly: z.boolean(),
   featured: z.boolean(),
   active: z.boolean(),
+  listed: z.boolean().default(true),
   sortOrder: z.number().int().min(0).max(1000),
 });
 

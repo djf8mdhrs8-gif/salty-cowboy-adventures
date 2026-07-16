@@ -12,7 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let tripEntries: MetadataRoute.Sitemap = [];
   try {
     const trips = await prisma.tripPackage.findMany({
-      where: { active: true },
+      where: { active: true, listed: true },
       select: { slug: true, updatedAt: true },
     });
     tripEntries = trips.map((t) => ({

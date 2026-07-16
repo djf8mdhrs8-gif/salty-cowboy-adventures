@@ -78,8 +78,9 @@ async function main() {
     },
     {
       slug: "full-day-fishing-charter",
-      name: "Full-Day Fishing Charter",
+      name: "Inshore Fishing Charter — 8 Hours",
       tagline: "Eight hours on the water — the serious angler's day out.",
+      listed: false, // booked via the Inshore charter's trip-length picker
       description:
         "A full day to range farther, fish harder, and chase whatever's running. " +
         "Mix inshore and nearshore spots at the captain's call, with all gear provided and " +
@@ -108,10 +109,10 @@ async function main() {
       ],
       showFishingExperience: true,
       familyFriendly: true,
-      featured: true,
+      featured: false,
       sortOrder: 2,
       seoDescription:
-        "8-hour full-day fishing charter with equipment, cooler, and ice included. Book online with Salty Cowboy Adventures.",
+        "8-hour inshore fishing charter with equipment, cooler, and ice included. Book online with Salty Cowboy Adventures.",
     },
     {
       slug: "sunset-cruise",
@@ -231,6 +232,18 @@ async function main() {
     });
   }
   console.log(`  ✓ ${packages.length} trip packages`);
+
+  // One-time fixup: fold the standalone Full-Day charter into the Inshore
+  // charter as its 8-hour trip-length option. Matches on the old name so it
+  // runs once and never overrides later admin edits.
+  await prisma.tripPackage.updateMany({
+    where: { slug: "full-day-fishing-charter", name: "Full-Day Fishing Charter" },
+    data: {
+      name: "Inshore Fishing Charter — 8 Hours",
+      listed: false,
+      featured: false,
+    },
+  });
 
   // One-time fixup: attach real catch photos to the fishing charters on
   // databases created before the photos existed (only when no image is set).
