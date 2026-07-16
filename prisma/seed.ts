@@ -19,8 +19,11 @@ async function main() {
     data: { phone: "(239) 571-1479" },
   });
   await prisma.siteSettings.updateMany({
-    where: { id: "default", email: "ahoy@saltycowboyadventures.example.com" },
-    data: { email: "marcusterrero05@gmail.com" },
+    where: {
+      id: "default",
+      email: { in: ["ahoy@saltycowboyadventures.example.com", "marcusterrero05@gmail.com"] },
+    },
+    data: { email: "bookings@saltycowboyadventures.com" },
   });
   await prisma.siteSettings.updateMany({
     where: {

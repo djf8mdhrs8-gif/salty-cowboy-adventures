@@ -23,7 +23,7 @@ export function siteUrl(): string {
 export const PLACEHOLDER_CONTACT = {
   phone: "(239) 571-1479",
   phoneHref: "tel:+12395711479",
-  email: "marcusterrero05@gmail.com",
+  email: "bookings@saltycowboyadventures.com",
   marinaAddress: "Marco Island, FL (departure dock shared at booking)",
   serviceArea: "Marco Island, Naples, and the waters of Southwest Florida",
   instagram: "https://instagram.com/saltycowboyadventures",

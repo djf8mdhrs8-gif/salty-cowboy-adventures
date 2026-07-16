@@ -425,7 +425,7 @@ model SiteSettings {
   id                    String   @id @default("default")
   companyName           String   @default("Salty Cowboy Adventures Inc.")
   phone                 String   @default("(239) 571-1479")
-  email                 String   @default("marcusterrero05@gmail.com")
+  email                 String   @default("bookings@saltycowboyadventures.com")
   marinaAddress         String   @default("Marco Island, FL (departure dock shared at booking)")
   serviceArea           String   @default("Marco Island, Naples, and the waters of Southwest Florida")
   instagramUrl          String   @default("https://instagram.com/saltycowboyadventures")
