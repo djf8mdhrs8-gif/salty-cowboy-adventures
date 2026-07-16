@@ -8,7 +8,14 @@ export const SITE_EST = "2024";
 export const BOAT_NAME = "2018 24ft Skeeter center-console";
 
 export function siteUrl(): string {
-  return (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
+  // Explicit setting wins; otherwise fall back to the production domain
+  // Vercel injects, so links stay correct even if the env var is missing.
+  const configured =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : "http://localhost:3000");
+  return configured.replace(/\/$/, "");
 }
 
 /** Placeholder contact details — the live values are editable in the admin
