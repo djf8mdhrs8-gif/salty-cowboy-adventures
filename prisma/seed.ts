@@ -219,14 +219,26 @@ async function main() {
     },
   ] as const;
 
+  // Create-only: never overwrite fields the admin may have edited since.
   for (const p of packages) {
     await prisma.tripPackage.upsert({
       where: { slug: p.slug },
-      update: { ...p, included: [...p.included], whatToBring: [...p.whatToBring] },
+      update: {},
       create: { ...p, included: [...p.included], whatToBring: [...p.whatToBring] },
     });
   }
   console.log(`  ✓ ${packages.length} trip packages`);
+
+  // One-time fixup: attach real catch photos to the fishing charters on
+  // databases created before the photos existed (only when no image is set).
+  await prisma.tripPackage.updateMany({
+    where: { slug: "inshore-fishing-charter", imageUrl: null },
+    data: { imageUrl: "/photos/catch-1.jpg" },
+  });
+  await prisma.tripPackage.updateMany({
+    where: { slug: "full-day-fishing-charter", imageUrl: null },
+    data: { imageUrl: "/photos/catch-2.jpg" },
+  });
 
   // ── Add-ons ────────────────────────────────────────────────────────
   const addons = [
@@ -292,10 +304,11 @@ async function main() {
     },
   ] as const;
 
+  // Create-only, same as packages: admin edits survive redeploys.
   for (const a of addons) {
     await prisma.tripAddon.upsert({
       where: { slug: a.slug },
-      update: { ...a },
+      update: {},
       create: { ...a },
     });
   }

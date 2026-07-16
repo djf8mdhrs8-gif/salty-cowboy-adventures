@@ -1,8 +1,9 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { Star, MapPin, Anchor, Ship, LifeBuoy, Fish } from "lucide-react";
 import { prisma } from "@/lib/db";
-import { SITE_NAME, SITE_TAGLINE, PLACEHOLDER_CONTACT, siteUrl } from "@/lib/site";
+import { SITE_NAME, PLACEHOLDER_CONTACT, siteUrl } from "@/lib/site";
 import { FAQS, REVIEWS, WHY_CHOOSE_US } from "@/lib/content";
 import { localBusinessSchema, faqSchema } from "@/lib/schema-org";
 import { JsonLd } from "@/components/shared/JsonLd";
@@ -22,6 +23,15 @@ export const metadata: Metadata = {
 };
 
 const WHY_ICONS = [LifeBuoy, Ship, Fish, Star, Anchor, MapPin];
+
+const CATCH_GALLERY = [
+  { src: "/photos/catch-1.jpg", alt: "Guest holding a redfish caught in the Marco Island backwaters" },
+  { src: "/photos/catch-2.jpg", alt: "Guest with a big barracuda on a blue-water day offshore" },
+  { src: "/photos/catch-3.jpg", alt: "Guest smiling with a large red grouper aboard the boat" },
+  { src: "/photos/catch-4.jpg", alt: "Guest standing on the bow holding a shark before release" },
+  { src: "/photos/catch-5.jpg", alt: "Guest kneeling with a blacktip shark caught on the flats" },
+  { src: "/photos/catch-6.jpg", alt: "Young angler proudly holding a redfish on a family trip" },
+];
 
 export default async function HomePage() {
   const featured = await prisma.tripPackage.findMany({
@@ -182,6 +192,33 @@ export default async function HomePage() {
                 </li>
               );
             })}
+          </ul>
+        </div>
+      </section>
+
+      {/* ── Catch gallery ────────────────────────────────────────── */}
+      <section className="bg-cream-100 py-16" aria-labelledby="gallery">
+        <div className="container-content">
+          <SectionHeading
+            eyebrow="Fresh from the deck"
+            title="Recent catches aboard the Salty Cowboy"
+            intro="Real guests, real fish — sharks, barracuda, grouper, and redfish from the waters of Marco Island and Naples."
+          />
+          <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
+            {CATCH_GALLERY.map((photo) => (
+              <li
+                key={photo.src}
+                className="relative aspect-[3/4] overflow-hidden rounded-xl shadow-card"
+              >
+                <Image
+                  src={photo.src}
+                  alt={photo.alt}
+                  fill
+                  sizes="(max-width: 640px) 50vw, 33vw"
+                  className="object-cover transition-transform duration-300 hover:scale-105"
+                />
+              </li>
+            ))}
           </ul>
         </div>
       </section>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Check, Clock, Users, Wallet, Umbrella, ShieldCheck } from "lucide-react";
 import { prisma } from "@/lib/db";
@@ -47,11 +48,24 @@ export default async function TripDetailPage({ params }: Props) {
     <>
       <JsonLd data={tripProductSchema(trip)} />
 
-      <ScenicImage
-        label={`${trip.name} — scenic coastal water view`}
-        scene={slug.includes("sunset") ? "sunset" : slug.includes("dolphin") ? "marsh" : "ocean"}
-        className="h-56 w-full sm:h-72"
-      />
+      {trip.imageUrl ? (
+        <div className="relative h-56 w-full sm:h-72">
+          <Image
+            src={trip.imageUrl}
+            alt={`${trip.name} — a recent catch aboard the Salty Cowboy`}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-[center_25%]"
+          />
+        </div>
+      ) : (
+        <ScenicImage
+          label={`${trip.name} — scenic coastal water view`}
+          scene={slug.includes("sunset") ? "sunset" : slug.includes("dolphin") ? "marsh" : "ocean"}
+          className="h-56 w-full sm:h-72"
+        />
+      )}
 
       <div className="container-content grid gap-10 py-10 lg:grid-cols-[1fr_minmax(22rem,26rem)]">
         <div>
