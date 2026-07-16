@@ -5,11 +5,10 @@ import { prisma } from "@/lib/db";
 import { getStripe } from "@/lib/stripe";
 import { getSettings } from "@/lib/server/settings";
 import { issueManageToken } from "@/lib/server/manage-token";
+import { applyPaidCheckoutSession } from "@/lib/server/payments";
 import { sendEmail } from "@/lib/email/send";
 import { toBookingEmailData } from "@/lib/email/booking-data";
 import {
-  bookingConfirmationEmail,
-  paymentReceiptEmail,
   paymentFailedEmail,
   refundIssuedEmail,
 } from "@/lib/email/templates";
@@ -82,73 +81,14 @@ export async function POST(req: Request) {
 }
 
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session): Promise<void> {
-  if (session.payment_status !== "paid") return; // async methods settle later
-
-  const amountPaid = session.amount_total ?? 0;
-  const paymentIntentId =
-    typeof session.payment_intent === "string"
-      ? session.payment_intent
-      : session.payment_intent?.id;
-
-  const { booking, isFirstPayment } = await prisma.$transaction(async (tx) => {
-    const payment = await tx.payment.findUnique({
-      where: { stripeCheckoutSessionId: session.id },
-      include: { booking: true },
-    });
-    if (!payment) throw new Error(`No payment for checkout session ${session.id}`);
-    if (payment.status === "PAID") {
-      return { booking: null, isFirstPayment: false }; // already processed
-    }
-
-    await tx.payment.update({
-      where: { id: payment.id },
-      data: {
-        status: "PAID",
-        amountCents: amountPaid,
-        stripePaymentIntentId: paymentIntentId,
-        paidAt: new Date(),
-      },
-    });
-
-    const isFirstPayment = payment.booking.amountPaidCents === 0;
-    const newPaid = payment.booking.amountPaidCents + amountPaid;
-
-    const booking = await tx.booking.update({
-      where: { id: payment.bookingId },
-      data: {
-        amountPaidCents: newPaid,
-        holdExpiresAt: null, // paid bookings never expire
-        // Balance payments on an already-confirmed booking keep their status.
-        ...(payment.booking.status === "AWAITING_PAYMENT" ||
-        payment.booking.status === "PENDING"
-          ? { status: "CONFIRMED" as const }
-          : {}),
-      },
-      include: { customer: true, package: true },
-    });
-
-    return { booking, isFirstPayment };
-  });
-
-  if (!booking) return;
-
-  const settings = await getSettings();
-  const manageToken = await issueManageToken(booking.id);
-  const emailData = toBookingEmailData(booking, settings, manageToken);
-
-  if (isFirstPayment) {
-    await sendEmail({
-      to: booking.customer.email,
-      type: "BOOKING_CONFIRMATION",
-      content: bookingConfirmationEmail(emailData),
-      bookingId: booking.id,
-    });
-  }
-  await sendEmail({
-    to: booking.customer.email,
-    type: "PAYMENT_RECEIPT",
-    content: paymentReceiptEmail(emailData, amountPaid),
-    bookingId: booking.id,
+  await applyPaidCheckoutSession({
+    id: session.id,
+    payment_status: session.payment_status,
+    amount_total: session.amount_total,
+    paymentIntentId:
+      typeof session.payment_intent === "string"
+        ? session.payment_intent
+        : (session.payment_intent?.id ?? null),
   });
 }
 

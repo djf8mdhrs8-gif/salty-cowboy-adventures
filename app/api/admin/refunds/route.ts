@@ -6,6 +6,10 @@ import { refundRequestSchema } from "@/lib/validation/admin";
 import { handleApiError } from "@/lib/api-helpers";
 import { logAdminAction } from "@/lib/audit";
 import { clientIp } from "@/lib/rate-limit";
+import { getSettings } from "@/lib/server/settings";
+import { sendEmail } from "@/lib/email/send";
+import { toBookingEmailData } from "@/lib/email/booking-data";
+import { refundIssuedEmail } from "@/lib/email/templates";
 
 export const dynamic = "force-dynamic";
 
@@ -68,6 +72,54 @@ export async function POST(req: Request) {
         where: { id: refund.id },
         data: { stripeRefundId: stripeRefund.id },
       });
+
+      // Stripe usually settles refunds synchronously — finalize right away so
+      // totals and the customer email don't depend on webhook delivery. The
+      // charge.refunded webhook is idempotent against this (delta becomes 0).
+      if (stripeRefund.status === "succeeded") {
+        await prisma.$transaction(async (tx) => {
+          await tx.refund.update({
+            where: { id: refund.id },
+            data: { status: "SUCCEEDED" },
+          });
+          const refundedOnPayment = await tx.refund.aggregate({
+            where: { paymentId: payment.id, status: "SUCCEEDED" },
+            _sum: { amountCents: true },
+          });
+          await tx.payment.update({
+            where: { id: payment.id },
+            data: {
+              status:
+                (refundedOnPayment._sum.amountCents ?? 0) >= payment.amountCents
+                  ? "REFUNDED"
+                  : "PARTIALLY_REFUNDED",
+            },
+          });
+          const total = await tx.refund.aggregate({
+            where: { bookingId: payment.bookingId, status: "SUCCEEDED" },
+            _sum: { amountCents: true },
+          });
+          await tx.booking.update({
+            where: { id: payment.bookingId },
+            data: { refundedCents: total._sum.amountCents ?? 0 },
+          });
+        });
+
+        const booking = await prisma.booking.findUniqueOrThrow({
+          where: { id: payment.bookingId },
+          include: { customer: true, package: true },
+        });
+        const settings = await getSettings();
+        await sendEmail({
+          to: booking.customer.email,
+          type: "REFUND_ISSUED",
+          content: refundIssuedEmail(
+            toBookingEmailData(booking, settings),
+            body.amountCents,
+          ),
+          bookingId: booking.id,
+        });
+      }
     } catch (err) {
       await prisma.refund.update({
         where: { id: refund.id },
