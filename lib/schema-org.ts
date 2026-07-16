@@ -13,13 +13,13 @@ export function localBusinessSchema(): Record<string, unknown> {
     email: PLACEHOLDER_CONTACT.email,
     address: {
       "@type": "PostalAddress",
-      streetAddress: "123 Harbor Way",
-      addressLocality: "Coastal Town",
-      addressRegion: "ST",
-      postalCode: "00000",
+      addressLocality: "Marco Island",
+      addressRegion: "FL",
+      postalCode: "34145",
       addressCountry: "US",
     },
-    areaServed: PLACEHOLDER_CONTACT.serviceArea,
+    areaServed: ["Marco Island, FL", "Naples, FL", "Southwest Florida"],
+    founder: { "@type": "Person", name: "Captain Marcus Terrero" },
     sameAs: [PLACEHOLDER_CONTACT.instagram, PLACEHOLDER_CONTACT.facebook],
     priceRange: "$$$",
   };

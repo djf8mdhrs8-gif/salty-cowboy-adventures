@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     template: `%s | ${SITE_NAME}`,
   },
   description:
-    "Premium fishing charters, sunset cruises, dolphin tours, and private coastal adventures. Book your trip online with Salty Cowboy Adventures.",
+    "Premium fishing charters, sunset cruises, dolphin tours, and private coastal adventures in Marco Island and Naples, Florida. Book your trip online with Salty Cowboy Adventures.",
   openGraph: {
     type: "website",
     siteName: SITE_NAME,

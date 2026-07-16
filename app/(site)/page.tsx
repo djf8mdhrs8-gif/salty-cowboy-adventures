@@ -15,9 +15,9 @@ import { LogoBadge } from "@/components/brand/Logo";
 export const dynamic = "force-dynamic"; // reads featured trips from the DB
 
 export const metadata: Metadata = {
-  title: `${SITE_NAME} — ${SITE_TAGLINE}`,
+  title: `${SITE_NAME} — Marco Island & Naples, FL Charters`,
   description:
-    "Book premium fishing charters, sunset cruises, dolphin tours, and private coastal adventures online. Family-friendly, USCG-licensed, everything included.",
+    "Book fishing charters, sunset cruises, dolphin tours, and private boat trips in Marco Island and Naples, Florida. USCG-licensed Captain Marcus Terrero — family-friendly, everything included.",
   alternates: { canonical: siteUrl() },
 };
 
@@ -95,6 +95,47 @@ export default async function HomePage() {
           </div>
           <div className="flex items-center justify-center">
             <LogoBadge className="w-full max-w-sm drop-shadow-lg lg:max-w-md" />
+          </div>
+        </div>
+      </section>
+
+      {/* ── Meet Your Captain ────────────────────────────────────── */}
+      <section className="bg-navy-900 py-16" aria-labelledby="captain">
+        <div className="container-content grid items-center gap-10 lg:grid-cols-[minmax(16rem,20rem)_1fr]">
+          <ScenicImage
+            label="Captain Marcus Terrero at the helm — photo coming soon"
+            scene="sunset"
+            className="h-64 rounded-xl shadow-card lg:h-80"
+          />
+          <div>
+            <p className="mb-2 text-xs font-bold uppercase tracking-[0.3em] text-coastal-300">
+              At the helm
+            </p>
+            <h2 id="captain" className="text-3xl font-bold text-cream-50 sm:text-4xl">
+              Meet Your Captain
+            </h2>
+            <div className="mt-5 space-y-4 leading-relaxed text-cream-100/90">
+              <p>
+                <strong className="text-cream-50">Captain Marcus Terrero</strong> is a U.S.
+                Coast Guard Licensed Charter Captain with more than three years of professional
+                charter experience and a lifelong passion for the water. Having spent countless
+                hours navigating the waters of Marco Island and Naples, Florida, Marcus has
+                developed an in-depth knowledge of the area&apos;s fisheries, backwaters,
+                islands, and coastal ecosystems.
+              </p>
+              <p>
+                Whether you&apos;re looking to reel in your next big catch, explore secluded
+                beaches, spot dolphins, or simply enjoy a relaxing day on the water, Captain
+                Marcus is dedicated to providing a safe, professional, and unforgettable
+                experience for every guest.
+              </p>
+              <p>
+                At Salty Cowboy Adventures, every trip is customized to your group and focused
+                on creating lasting memories. From first-time anglers to experienced fishermen
+                and families looking to explore Southwest Florida&apos;s beautiful coastline,
+                Captain Marcus is committed to making every adventure one to remember.
+              </p>
+            </div>
           </div>
         </div>
       </section>

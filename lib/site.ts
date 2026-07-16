@@ -16,9 +16,9 @@ export function siteUrl(): string {
 export const PLACEHOLDER_CONTACT = {
   phone: "(239) 571-1479",
   phoneHref: "tel:+12395711479",
-  email: "ahoy@saltycowboyadventures.example.com",
-  marinaAddress: "Dock 7, Placeholder Marina, 123 Harbor Way, Coastal Town, ST 00000",
-  serviceArea: "Coastal Town and surrounding waters",
+  email: "marcusterrero05@gmail.com",
+  marinaAddress: "Marco Island, FL (departure dock shared at booking)",
+  serviceArea: "Marco Island, Naples, and the waters of Southwest Florida",
   instagram: "https://instagram.com/saltycowboyadventures",
   facebook: "https://facebook.com/saltycowboyadventures",
 };

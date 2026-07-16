@@ -12,11 +12,26 @@ async function main() {
     update: {},
     create: { id: "default" },
   });
-  // One-time fixup: replace the retired placeholder phone number on existing
-  // databases without overwriting a number the admin has since customized.
+  // One-time fixups: replace retired placeholder contact values on existing
+  // databases without overwriting values the admin has since customized.
   await prisma.siteSettings.updateMany({
     where: { id: "default", phone: "(555) 123-4567" },
     data: { phone: "(239) 571-1479" },
+  });
+  await prisma.siteSettings.updateMany({
+    where: { id: "default", email: "ahoy@saltycowboyadventures.example.com" },
+    data: { email: "marcusterrero05@gmail.com" },
+  });
+  await prisma.siteSettings.updateMany({
+    where: {
+      id: "default",
+      marinaAddress: "Dock 7, Placeholder Marina, 123 Harbor Way, Coastal Town, ST 00000",
+    },
+    data: { marinaAddress: "Marco Island, FL (departure dock shared at booking)" },
+  });
+  await prisma.siteSettings.updateMany({
+    where: { id: "default", serviceArea: "Coastal Town and surrounding waters" },
+    data: { serviceArea: "Marco Island, Naples, and the waters of Southwest Florida" },
   });
 
   // ── Trip packages ──────────────────────────────────────────────────
