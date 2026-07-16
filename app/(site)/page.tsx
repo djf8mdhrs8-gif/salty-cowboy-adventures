@@ -26,7 +26,7 @@ const WHY_ICONS = [LifeBuoy, Ship, Fish, Star, Anchor, MapPin];
 
 const CATCH_GALLERY = [
   { src: "/photos/catch-1.jpg", alt: "Guest holding a redfish caught in the Marco Island backwaters" },
-  { src: "/photos/catch-2.jpg", alt: "Guest with a big barracuda on a blue-water day offshore" },
+  { src: "/photos/catch-2.jpg", alt: "Captain Marcus with a big barracuda on a blue-water day offshore" },
   { src: "/photos/catch-3.jpg", alt: "Guest smiling with a large red grouper aboard the boat" },
   { src: "/photos/catch-4.jpg", alt: "Guest standing on the bow holding a shark before release" },
   { src: "/photos/catch-5.jpg", alt: "Guest kneeling with a blacktip shark caught on the flats" },
@@ -115,11 +115,15 @@ export default async function HomePage() {
       {/* ── Meet Your Captain ────────────────────────────────────── */}
       <section className="bg-navy-900 py-16" aria-labelledby="captain">
         <div className="container-content grid items-center gap-10 lg:grid-cols-[minmax(16rem,20rem)_1fr]">
-          <ScenicImage
-            label="Captain Marcus Terrero at the helm — photo coming soon"
-            scene="sunset"
-            className="h-64 rounded-xl shadow-card lg:h-80"
-          />
+          <div className="relative h-80 overflow-hidden rounded-xl shadow-card lg:h-[26rem]">
+            <Image
+              src="/photos/catch-2.jpg"
+              alt="Captain Marcus Terrero holding a big barracuda on a blue-water day offshore"
+              fill
+              sizes="(max-width: 1024px) 100vw, 20rem"
+              className="object-cover object-top"
+            />
+          </div>
           <div>
             <p className="mb-2 text-xs font-bold uppercase tracking-[0.3em] text-coastal-300">
               At the helm
