@@ -1,6 +1,6 @@
 import { formatCents } from "@/lib/money";
 import { formatYmd, formatTime, formatDuration } from "@/lib/dates";
-import { SITE_NAME } from "@/lib/site";
+import { SITE_NAME, siteUrl } from "@/lib/site";
 
 /**
  * Transactional email templates. Plain, well-structured HTML that renders in
@@ -42,8 +42,9 @@ function layout(title: string, bodyHtml: string, footerNote: string): string {
 <body style="margin:0;padding:0;background:${BRAND.cream};font-family:Georgia,serif;color:${BRAND.navy};">
   <div style="max-width:560px;margin:0 auto;padding:24px 16px;">
     <div style="text-align:center;padding:20px 0;">
-      <div style="font-size:22px;font-weight:bold;letter-spacing:1px;">🤠 ${SITE_NAME}</div>
-      <div style="font-size:12px;color:${BRAND.coastal};letter-spacing:2px;text-transform:uppercase;">Charters &amp; Coastal Adventures</div>
+      <img src="${siteUrl()}/logo-email.png" width="88" height="88" alt="${SITE_NAME} logo" style="display:block;margin:0 auto 8px;" />
+      <div style="font-size:22px;font-weight:bold;letter-spacing:1px;">${SITE_NAME}</div>
+      <div style="font-size:12px;color:${BRAND.coastal};letter-spacing:2px;text-transform:uppercase;">Explore More. Live Salty.</div>
     </div>
     <div style="background:#ffffff;border:1px solid #e3d4bb;border-radius:10px;padding:28px;">
       <h1 style="font-size:20px;margin:0 0 16px;color:${BRAND.navy};">${title}</h1>
