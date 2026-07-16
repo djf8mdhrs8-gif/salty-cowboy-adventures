@@ -14,8 +14,8 @@ export function siteUrl(): string {
 /** Placeholder contact details — the live values are editable in the admin
  *  Settings page (stored in the SiteSettings table). */
 export const PLACEHOLDER_CONTACT = {
-  phone: "(555) 123-4567",
-  phoneHref: "tel:+15551234567",
+  phone: "(239) 571-1479",
+  phoneHref: "tel:+12395711479",
   email: "ahoy@saltycowboyadventures.example.com",
   marinaAddress: "Dock 7, Placeholder Marina, 123 Harbor Way, Coastal Town, ST 00000",
   serviceArea: "Coastal Town and surrounding waters",
