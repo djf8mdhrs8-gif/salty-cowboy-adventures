@@ -239,6 +239,14 @@ async function main() {
     where: { slug: "full-day-fishing-charter", imageUrl: null },
     data: { imageUrl: "/photos/catch-2.jpg" },
   });
+  await prisma.tripPackage.updateMany({
+    where: { slug: "sunset-cruise", imageUrl: null },
+    data: { imageUrl: "/photos/sunset-cruise.jpg" },
+  });
+  await prisma.tripPackage.updateMany({
+    where: { slug: "private-coastal-adventure", imageUrl: null },
+    data: { imageUrl: "/photos/tubing.jpg" },
+  });
 
   // ── Add-ons ────────────────────────────────────────────────────────
   const addons = [

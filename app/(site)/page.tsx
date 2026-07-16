@@ -47,12 +47,15 @@ export default async function HomePage() {
 
       {/* ── Hero ─────────────────────────────────────────────────── */}
       <section className="relative isolate overflow-hidden bg-navy-900">
-        <ScenicImage
-          label=""
-          scene="sunset"
-          className="absolute inset-0 opacity-40"
+        <Image
+          src="/photos/hero-sunset.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-[center_42%]"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-navy-950/90 via-navy-900/60 to-navy-900/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-navy-950/85 via-navy-900/45 to-navy-900/25" />
         <div className="container-content relative py-24 text-center sm:py-32 lg:py-40">
           <p className="mb-4 text-xs font-bold uppercase tracking-[0.35em] text-coastal-300">
             Explore More · Live Salty
