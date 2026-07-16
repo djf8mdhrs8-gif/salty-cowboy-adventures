@@ -8,7 +8,6 @@ import { FAQS, REVIEWS, WHY_CHOOSE_US } from "@/lib/content";
 import { localBusinessSchema, faqSchema } from "@/lib/schema-org";
 import { JsonLd } from "@/components/shared/JsonLd";
 import { SectionHeading } from "@/components/shared/SectionHeading";
-import { ScenicImage } from "@/components/shared/ScenicImage";
 import { TripCard } from "@/components/trips/TripCard";
 import { PhoneLink } from "@/components/shared/PhoneLink";
 import { LogoBadge } from "@/components/brand/Logo";
@@ -161,6 +160,7 @@ export default async function HomePage() {
       <section className="bg-cream-100 py-16" aria-labelledby="featured-trips">
         <div className="container-content">
           <SectionHeading
+            id="featured-trips"
             eyebrow="Featured charters"
             title="Pick your adventure"
             intro="Every trip is private to your group and includes the captain, fuel, and gear."
@@ -182,6 +182,7 @@ export default async function HomePage() {
       <section className="bg-cream-50 py-16" aria-labelledby="why-us">
         <div className="container-content">
           <SectionHeading
+            id="why-us"
             eyebrow="Why ride with us"
             title="Premium trips, no pretense"
           />
@@ -207,6 +208,7 @@ export default async function HomePage() {
       <section className="bg-cream-100 py-16" aria-labelledby="gallery">
         <div className="container-content">
           <SectionHeading
+            id="gallery"
             eyebrow="Fresh from the deck"
             title="Recent catches aboard the Salty Cowboy"
             intro="Real guests, real fish — sharks, barracuda, grouper, and redfish from the waters of Marco Island and Naples."
@@ -264,13 +266,18 @@ export default async function HomePage() {
       {/* ── Service area ─────────────────────────────────────────── */}
       <section className="bg-cream-50 py-16" aria-labelledby="service-area">
         <div className="container-content grid items-center gap-10 lg:grid-cols-2">
-          <ScenicImage
-            label="Map-style view of the coastal service area with barrier islands"
-            scene="marsh"
-            className="order-2 h-72 rounded-xl shadow-card lg:order-1 lg:h-80"
-          />
+          <div className="relative order-2 h-72 overflow-hidden rounded-xl shadow-card lg:order-1 lg:h-80">
+            <Image
+              src="/photos/service-area.jpg"
+              alt="Turquoise water flowing between white-sand barrier islands near Marco Island"
+              fill
+              sizes="(max-width: 1024px) 100vw, 36rem"
+              className="object-cover"
+            />
+          </div>
           <div className="order-1 lg:order-2">
             <SectionHeading
+              id="service-area"
               center={false}
               eyebrow="Where we ride"
               title="Our service area"
@@ -291,7 +298,7 @@ export default async function HomePage() {
       {/* ── FAQ ──────────────────────────────────────────────────── */}
       <section className="bg-cream-100 py-16" aria-labelledby="faq">
         <div className="container-content max-w-3xl">
-          <SectionHeading eyebrow="Before you board" title="Frequently asked questions" />
+          <SectionHeading id="faq" eyebrow="Before you board" title="Frequently asked questions" />
           <div className="space-y-3">
             {FAQS.slice(0, 6).map((f) => (
               <details

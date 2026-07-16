@@ -3,11 +3,13 @@ export function SectionHeading({
   title,
   intro,
   center = true,
+  id,
 }: {
   eyebrow?: string;
   title: string;
   intro?: string;
   center?: boolean;
+  id?: string;
 }) {
   return (
     <div className={`mb-10 max-w-2xl ${center ? "mx-auto text-center" : ""}`}>
@@ -16,7 +18,7 @@ export function SectionHeading({
           {eyebrow}
         </p>
       ) : null}
-      <h2 className="text-3xl font-bold sm:text-4xl">{title}</h2>
+      <h2 id={id} className="text-3xl font-bold sm:text-4xl">{title}</h2>
       {intro ? <p className="mt-4 text-lg leading-relaxed text-navy-600">{intro}</p> : null}
     </div>
   );
