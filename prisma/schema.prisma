@@ -442,6 +442,9 @@ model SiteSettings {
   reminderDaysBefore    Int[]    @default([7, 1]) // trip reminder schedule
   balanceReminderDays   Int      @default(3) // days before trip to chase open balances
   policyVersion         String   @default("2026-01-v1")
+  // Secret token protecting the iCal subscription feed (/api/calendar-feed).
+  // DB-generated so existing rows are backfilled when the column is added.
+  calendarFeedKey       String   @default(dbgenerated("(gen_random_uuid())::text"))
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 }
