@@ -88,6 +88,7 @@ enum EmailType {
   WEATHER_CANCELLATION
   MAGIC_LINK
   CONTACT_FORM
+  OWNER_NEW_BOOKING
 }
 
 enum EmailStatus {

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { getSettings } from "@/lib/server/settings";
 import { issueManageToken } from "@/lib/server/manage-token";
 import { sendEmail } from "@/lib/email/send";
+import { notifyOwnerOfNewBooking } from "@/lib/server/notify";
 import { toBookingEmailData } from "@/lib/email/booking-data";
 import {
   bookingConfirmationEmail,
@@ -84,6 +85,10 @@ export async function applyPaidCheckoutSession(session: PaidSessionInput): Promi
       content: bookingConfirmationEmail(emailData),
       bookingId: booking.id,
     });
+    // Alert the business: inbox email always, SMS when Twilio is configured.
+    await notifyOwnerOfNewBooking(booking, settings).catch((err) =>
+      console.error("Owner notification failed:", err),
+    );
   }
   await sendEmail({
     to: booking.customer.email,
