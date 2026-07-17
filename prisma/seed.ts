@@ -263,6 +263,10 @@ async function main() {
     where: { slug: "private-coastal-adventure", imageUrl: null },
     data: { imageUrl: "/photos/tubing.jpg" },
   });
+  await prisma.tripPackage.updateMany({
+    where: { slug: "dolphin-wildlife-tour", imageUrl: null },
+    data: { imageUrl: "/photos/dolphin-tour.jpg" },
+  });
 
   // ── Add-ons ────────────────────────────────────────────────────────
   const addons = [

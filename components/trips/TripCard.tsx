@@ -5,7 +5,7 @@ import type { TripPackage } from "@prisma/client";
 import { formatCents } from "@/lib/money";
 import { formatDuration } from "@/lib/dates";
 import { ScenicImage } from "@/components/shared/ScenicImage";
-import { DURATION_CARD_LABELS } from "@/lib/trip-groups";
+import { DURATION_CARD_LABELS, IMAGE_POSITION_BY_SLUG } from "@/lib/trip-groups";
 
 const SCENE_BY_SLUG: Record<string, "ocean" | "sunset" | "marsh"> = {
   "sunset-cruise": "sunset",
@@ -28,7 +28,7 @@ export function TripCard({ trip }: { trip: TripPackage }) {
               alt={`${trip.name} — a recent catch aboard the Salty Cowboy`}
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="object-cover object-[center_30%]"
+              className={`object-cover ${IMAGE_POSITION_BY_SLUG[trip.slug] ?? "object-[center_30%]"}`}
             />
           </div>
         ) : (

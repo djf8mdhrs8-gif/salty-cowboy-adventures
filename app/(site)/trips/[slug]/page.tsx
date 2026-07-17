@@ -10,7 +10,7 @@ import { tripProductSchema } from "@/lib/schema-org";
 import { JsonLd } from "@/components/shared/JsonLd";
 import { ScenicImage } from "@/components/shared/ScenicImage";
 import { TripAvailability } from "@/components/trips/TripAvailability";
-import { durationGroupFor } from "@/lib/trip-groups";
+import { durationGroupFor, IMAGE_POSITION_BY_SLUG } from "@/lib/trip-groups";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -69,7 +69,7 @@ export default async function TripDetailPage({ params }: Props) {
             fill
             priority
             sizes="100vw"
-            className="object-cover object-[center_25%]"
+            className={`object-cover ${IMAGE_POSITION_BY_SLUG[trip.slug] ?? "object-[center_25%]"}`}
           />
         </div>
       ) : (

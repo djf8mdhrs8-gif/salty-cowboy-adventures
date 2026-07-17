@@ -16,3 +16,11 @@ export const DURATION_CARD_LABELS: Record<string, string> = {
 export function durationGroupFor(slug: string): string[] | null {
   return DURATION_GROUPS.find((group) => group.includes(slug)) ?? null;
 }
+
+/**
+ * Per-trip image focal point (Tailwind object-position class) for photos
+ * whose subject isn't near the top of the frame.
+ */
+export const IMAGE_POSITION_BY_SLUG: Record<string, string> = {
+  "dolphin-wildlife-tour": "object-[center_62%]",
+};
